@@ -1,9 +1,9 @@
 package main
 
 import (
-	"kiabq/hyperslice/cmd"
+	server "kiabq/hyperslice/internal/server"
 )
 
 func main() {
-	cmd.Start()
+	server.Start()
 }
