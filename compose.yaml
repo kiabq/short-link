@@ -1,0 +1,45 @@
+services:
+  frontend:
+    build: 
+      context: ./client/.
+      args:
+        - PUBLIC_BACKEND_URL="${PUBLIC_BACKEND_URL}"
+    restart: unless-stopped
+
+    ports:
+      - "4321:4321"
+    env_file:
+      - .env
+    container_name: hyperslice-frontend
+  api:
+    ports:
+      - "3001:3001"
+    build: ./api/.
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - hyperslice
+    env_file:
+      - .env
+    container_name: hyperslice-api
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    shm_size: 256mb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - hyperslice-db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    container_name: hyperslice-db
+    networks:
+      - hyperslice
+volumes:
+  hyperslice-db:
+    driver: local
+networks:
+  hyperslice:
+    driver: bridge
