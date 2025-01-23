@@ -13,7 +13,7 @@ services:
     container_name: hyperslice-frontend
   api:
     ports:
-      - "3001:3001"
+      - "8080:8080"
     build: ./api/.
     restart: unless-stopped
     depends_on:

@@ -1,11 +1,16 @@
-# Description: Dockerfile for the APIs
-FROM node:lts
+# Description: Dockerfile for the API
+FROM golang:latest as build
 WORKDIR /api
+
+# Copy Go module files and download them.
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy all source code.
 COPY . .
 
-# Install typescript and ts-node
-RUN npm install -g typescript ts-node
-RUN npm install
+# Build the application
+RUN go build -o /hyperslice
 
 # Define ARGS and ENV
 ARG BACKEND_URL
@@ -28,8 +33,5 @@ ENV POSTGRES_DATABASE=$POSTGRES_DATABASE
 RUN echo "BACKEND URL IS: ${BACKEND_URL}"
 RUN echo "FRONTEND URL IS: ${FRONTEND_URL}"
 
-# Expose port 3000
-EXPOSE 3000
-
-# Run the server
-CMD ts-node index.ts
+EXPOSE 8080
+CMD [ "/hyperslice" ]
