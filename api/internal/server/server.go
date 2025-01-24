@@ -10,9 +10,16 @@ import (
 	"time"
 
 	"github.com/jackc/pgx"
+	"github.com/joho/godotenv"
 )
 
 func Start() {
+	err := godotenv.Load(".env.local")
+	if err != nil {
+		// TODO: Do a graceful shutdown if this occurs
+		fmt.Errorf("Error loading environment variables: %w", err)
+	}
+
 	s := &http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  10 * time.Second,
@@ -20,9 +27,9 @@ func Start() {
 	}
 
 	port, err := strconv.ParseUint(os.Getenv("DATABASE_PORT"), 10, 16)
-
 	if err != nil {
-		// throw error
+		// TODO: Do a graceful shutdown if this occurs
+		fmt.Errorf("Error parsing port to 16 bit uint: %w", err)
 	}
 
 	config := pgx.ConnConfig{
@@ -34,9 +41,14 @@ func Start() {
 	}
 
 	conn, err := pgx.Connect(config)
+	if err != nil {
+		fmt.Errorf("Error connecting to Postgres database: %+w\n", err)
+	}
+
+	// Do something with this connection eventually
 	fmt.Println(conn)
 
+	// start server
 	routes.RegisterRoutes()
-
 	log.Fatal(s.ListenAndServe())
 }
