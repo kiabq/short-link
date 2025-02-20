@@ -29,4 +29,6 @@ src/**/*.ts.map
 # editor files
 .vscode
 
+tmp/
+
 api-old/
